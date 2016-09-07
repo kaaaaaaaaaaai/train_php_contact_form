@@ -1,6 +1,6 @@
 <?php
 
-require "/Users/hw-0138/train_workspace/php_contactForm/Request.php";
+namespace App\Controller;
 
 class contactController{
 

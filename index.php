@@ -1,9 +1,6 @@
-ogita
-ここが最初のやつ
 <?php
 
-require_once "route.php";
+require_once __DIR__."/vendor/autoload.php";
 
-$r = new route();
+$r = new App\Http\route();
 $r->dispatch();
-
