@@ -1,7 +1,8 @@
 <?php
 
-class route {
+namespace App\Http;
 
+class route {
     public function dispatch(){
 
         //urlのパラメーターを分ける。
@@ -16,5 +17,4 @@ class route {
         //そのアクションメソッドの実行
         $controllerInstance->$_ActionName();
     }
-
 }
