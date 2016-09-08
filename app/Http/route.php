@@ -2,6 +2,13 @@
 namespace App\Http;
 
 class route {
+    protected $request;
+
+    public function __construct(Request $req)
+    {
+        $this->request = $req;
+    }
+
     public function dispatch(){
 
         //urlのパラメーターを分ける。
@@ -10,37 +17,24 @@ class route {
 
         $params = explode("/", trim($url,'/'));
 
-        if (!isset($params[0])){
-            // return 404
-            throw new HttpException(404,"Class NotFound");
-        }
+        if (!isset($params[0])) throw new HttpException(404,"Class NotFound");
+        if (!isset($params[1])) throw new HttpException(404,"Method NotFound");
 
-        $_ControllerName = $params[0];
+        /*paramからcontroller名とAction名をとる*/
+        $_ControllerName    = $params[0];
 
-        if(!isset($params[1])) {
-            //404
-            throw new HttpException(404,"Method NotFound");
-        }
+        //append HttpParameter
+        $_ActionName        = mb_strtolower($this->request->getRequestMethod())."_".$params[1];
 
-        $_ActionName = $params[1];
-        //コントローラーのインスタンスを作る。
-        if(!class_exists("App\\Controller\\{$_ControllerName}Controller")){
-            //未定義error
-            throw new HttpException(404,"class Undefined");
-        }
-        //fileの有無の判定
+        if(!class_exists("App\\Controller\\{$_ControllerName}Controller")) throw new HttpException(404,"class Undefined");
+
         $controllerClassName = "App\\Controller\\{$_ControllerName}Controller";
 
-        if(!method_exists($controllerClassName,"{$_ActionName}")){
-            //未定義error
-            throw new HttpException(404,"Method Undefined");
-        }
-
-
+        //action判定
+        if(!method_exists($controllerClassName,"{$_ActionName}")) throw new HttpException(404,"Method Undefined");
+        
         $controllerInstance = new $controllerClassName();
         //そのアクションメソッドの実行
-        //get postの判定
-        $view = $controllerInstance->$_ActionName();
-        
+        $controllerInstance->$_ActionName();
     }
 }
