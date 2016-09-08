@@ -2,19 +2,16 @@
 
 namespace App\Controller;
 
+use App\Http\Request;
+
 class contactController{
-
-    public function index(){
-        //require_once("/Users/hw-0138/train_workspace/php_contactForm/view/input.php");
-        //view();
-
+    public function get_index(){
         //templateを読み込むため
         view("view.input");
     }
 
-    public function confirm(){
-        $req = new Post();
-        var_dump($req->getValueByKey('name'));
-        
+    public function post_confirm(){
+        $request    = new Request();
+        view('view.confirm',$request->getPostAll());
     }
 }

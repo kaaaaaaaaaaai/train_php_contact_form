@@ -11,6 +11,10 @@ class HttpException extends \Exception{
 
     public function __construct($code, $message)
     {
+        /*
+         * header("HTTP/1.1 {$code}");
+         * echo "{$message}";
+         * */
         die("{$code} => {$message}");
     }
 }
