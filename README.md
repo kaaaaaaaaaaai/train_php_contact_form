@@ -6,3 +6,6 @@ root_dir
 php -S localhost:8000
 ```
 
+```
+composer install
+```
