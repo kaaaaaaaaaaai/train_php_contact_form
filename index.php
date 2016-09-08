@@ -6,6 +6,6 @@ require_once __DIR__."/Util.php";
 $r = new App\Http\route(new \App\Http\Request());
 try{
     $r->dispatch();
-}catch (HttpException $e){
-    
+}catch (App\Http\HttpException $e){
+    echo "error in index.php {$e->getMessage()}";
 }
