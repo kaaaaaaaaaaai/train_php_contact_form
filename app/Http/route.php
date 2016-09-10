@@ -17,24 +17,42 @@ class route {
 
         $params = explode("/", trim($url,'/'));
 
-        if (!isset($params[0])) throw new HttpException(404,"Class NotFound");
-        if (!isset($params[1])) throw new HttpException(404,"Method NotFound");
+        if (!isset($params[0])){
+            throw new HttpException(404,"Class NotFound");
+        }
+        if (!isset($params[1])) {
+            throw new HttpException(404,"Method NotFound");
+        }
 
         /*paramからcontroller名とAction名をとる*/
-        $_ControllerName    = $params[0];
 
-        //append HttpParameter
-        $_ActionName        = mb_strtolower($this->request->getRequestMethod())."_".$params[1];
+        $_controllerName = $this->ConvertControllerName($params[0]);
+        //append HttpParameterw
+        $_controllerNameSpace = "App\\Controller\\{$_controllerName}Controller";
 
-        if(!class_exists("App\\Controller\\{$_ControllerName}Controller")) throw new HttpException(404,"class Undefined");
+        if(!class_exists($_controllerNameSpace)){
+            throw new HttpException(404,"class Undefined");
+        }
 
-        $controllerClassName = "App\\Controller\\{$_ControllerName}Controller";
+        $_controllerInstance = new $_controllerNameSpace();
 
+        $_lowerRequestMethod = mb_strtolower($this->request->getRequestMethod());
+
+        $_actionName    = "{$_lowerRequestMethod}_{$params[1]}";
         //action判定
-        if(!method_exists($controllerClassName,"{$_ActionName}")) throw new HttpException(404,"Method Undefined");
-        
-        $controllerInstance = new $controllerClassName();
+        if(!method_exists($_controllerInstance, $_actionName)){
+            throw new HttpException(404,"Method Undefined");
+        }
+
         //そのアクションメソッドの実行
-        $controllerInstance->$_ActionName();
+        $_controllerInstance->$_actionName();
+    }
+
+    private function ConvertControllerName($name){
+        //全て小文字にする
+        $_lowerControllerName = mb_strtolower($name);
+        //先頭文字を大文字に
+        $_ControllerName = ucfirst($_lowerControllerName);
+        return $_ControllerName;
     }
 }
