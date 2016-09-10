@@ -16,7 +16,7 @@ function view($file_path, $data=null){
         throw new HttpException(404,"Method NotFound");
     }
 
-    if (isset($data)){
+    if (!is_null($data)){
         extract($data);
     }
     include dirname($_SERVER["SCRIPT_FILENAME"]).$replaceFilePath;
