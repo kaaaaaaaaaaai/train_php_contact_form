@@ -18,17 +18,21 @@ class Validate {
     }
 
     public function run(){
-        //ruleで回す
+        /* $ruleData = ["name" => "required|max:255"]
+         * ruleの|の切り出し
+         */
+
         foreach ($this->ruleData as $adaptDataKey => $ruleText){
-            //定義されているか確認
-            //max:255　のような場合は分割する
+            // |で複数区切られている場合は切り分ける
             if(preg_match("/|/", $ruleText)){
                 $ruleArray = explode("|", $ruleText);
 
                 foreach ($ruleArray as $rule){
+                    //切り分け後実行
                     $this->method_run($rule, $adaptDataKey);
                 }
             }else{
+                //切り分けないならそのまま実行
                 $this->method_run($ruleText, $adaptDataKey);
             }
         }
@@ -37,10 +41,11 @@ class Validate {
     }
 
     /*
-     * $rule  = 呼び出すrule名
+     * $rule  = 呼び出すruleMethod名
      * $key   = validationするdataのkey
      * */
     private function method_run($rule, $key){
+        //ruleに範囲があるならそれを切り出す
         if(preg_match("/:/", $rule)){
             $params     = explode(":", $rule);
             $rule       = $params[0];
@@ -89,7 +94,7 @@ class Validate {
         return is_bool($this->data[$key]);
     }
 
-    private function max($key, $num){
+    private function max($key, $num=1){
         if(strlen($this->data[$key]) <= $num){
             return true;
         }else{
@@ -97,7 +102,7 @@ class Validate {
         }
     }
 
-    private function min($key, $num){
+    private function min($key, $num=1){
         if(strlen($this->data[$key]) >= $num){
             return true;
         }else{
@@ -114,63 +119,3 @@ class Validate {
         $this->is_success = false;
     }
 }
-
-//中身があるのにruleがないとエラーでる。
-//多重配列対応してない
-//２個同じkeyでくると困る
-/*
- * true pattern
- */
-/*
-$validate = new Validate();
-$truePattern = array(
-    "name"  =>"ogita",
-    "age"   =>22,
-    "email" =>"ogita@rich.co.jp",
-    "gender"=>true
-);
-$validate->setData($truePattern);
-
-$rules = array(
-    "name"  => "required",
-    "age"   => "numeric",
-    "email" => "email",
-    "gender"=> "bool"
-);
-$validate->setRules($rules);
-
-if(!$validate->run()){
-    var_dump($validate->getMessage());
-}else{
-    print_r("success".PHP_EOL);
-}
-*/
-/*
- *
- * false pattern
- */
-/*
-$validate = new Validate();
-$truePattern = array(
-    "name"  => null,
-    "age"   => "わからん",
-    "email" => "!!ogita!!@rich!.co.jp",
-    "gender"=> 0,
-);
-$validate->setData($truePattern);
-
-$rules = array(
-    //"name"  => "required",
-    "age"   => "numeric|number|max:255",
-    "name"  => "reqqq",
-    //"email" =>  "email",
-    //"gender"=> "bool",
-);
-
-$validate->setRules($rules);
-
-if(!$validate->run()){
-    print_r($validate->getMessage());
-}
-
-*/

@@ -17,7 +17,7 @@ class contactController{
         $rules = [
             'name'      =>  'required|max:255',
             'gender'    =>  'required',
-            'comment'   =>  'max:255',
+            'comment'   =>  'max:255|required',
             'email'     =>  'required|email',
         ];
         //set
