@@ -3,49 +3,78 @@
 namespace App\Validation;
 
 class Validate {
-    protected $rules    = array();
+    protected $ruleData    = "";
     protected $data     = array();
     protected $message  = array();
     protected $is_success = true;
+    protected $num      = 0;
 
     public function setData($data){
         $this->data = $data;
     }
 
-    public function setRules($rules){
-        $this->rules = $rules;
+    public function setRules($ruleData){
+        $this->ruleData = $ruleData;
     }
 
     public function run(){
         //ruleで回す
-        foreach ($this->rules as $key => $value){
+        foreach ($this->ruleData as $adaptDataKey => $ruleText){
             //定義されているか確認
-            if(method_exists(__CLASS__, $value)){
-                //method true
+            //max:255　のような場合は分割する
+            if(preg_match("/|/", $ruleText)){
+                $ruleArray = explode("|", $ruleText);
 
-                //dataがあるか
-                if(isset($this->data[$key])){
-                    //rule名のmethodを呼び出す
-                    if(!$this->$value($key)){
-                        //失敗なら
-                        $this->setMessage($key, $value, "Need {$value} type");
-                    }
-                }else{
-                    //Dataがない
-                    $this->setMessage($key, $value, "Need Set {$value}");
+                foreach ($ruleArray as $rule){
+                    $this->method_run($rule, $adaptDataKey);
                 }
-
             }else{
-                //method false
-                $this->setMessage($key, $value, "{$value} is not define");
+                $this->method_run($ruleText, $adaptDataKey);
             }
         }
 
         return $this->is_success;
     }
 
+    /*
+     * $rule  = 呼び出すrule名
+     * $key   = validationするdataのkey
+     * */
+    private function method_run($rule, $key){
+        if(preg_match("/:/", $rule)){
+            $params     = explode(":", $rule);
+            $rule       = $params[0];
+            $this->num  = $params[1];
+        }
+
+        if(method_exists(__CLASS__, $rule)){
+            //dataがあるか
+            if(isset($this->data[$key])){
+                //rule名のmethodを呼び出す
+                if(!$this->$rule($key, $this->num)){
+                    //失敗なら
+                    $this->setMessage($key, $rule, "Need {$rule} type");
+                }
+            }else{
+                //Dataがない
+                $this->setMessage($key, $rule, "Need Set {$rule}");
+            }
+        }else{
+            //method false
+            $this->setMessage($key, $rule, "{$rule} is not define");
+        }
+    }
+
     private function required($key){
-        return !is_null($this->data[$key]);
+        if(is_null($this->data[$key])){
+            return false;
+        }
+        //空白を取り除いて空白判定
+        if((preg_replace("/( |　)/", "", $this->data[$key]) == "")){
+            return false;
+        }
+        return true;
+
     }
 
     private function numeric($key){
@@ -58,6 +87,22 @@ class Validate {
 
     private function bool($key){
         return is_bool($this->data[$key]);
+    }
+
+    private function max($key, $num){
+        if(strlen($this->data[$key]) <= $num){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private function min($key, $num){
+        if(strlen($this->data[$key]) >= $num){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function getMessage(){
@@ -110,22 +155,22 @@ $truePattern = array(
     "name"  => null,
     "age"   => "わからん",
     "email" => "!!ogita!!@rich!.co.jp",
-    "gender"=> 0
+    "gender"=> 0,
 );
 $validate->setData($truePattern);
 
 $rules = array(
-    "name"  => "required",
-    "age"   => "numeric",
+    //"name"  => "required",
+    "age"   => "numeric|number|max:255",
     "name"  => "reqqq",
-    "age"   =>  "number",
-    "email" =>  "email",
-    "gender"=> "bool",
-
+    //"email" =>  "email",
+    //"gender"=> "bool",
 );
+
 $validate->setRules($rules);
 
 if(!$validate->run()){
-    var_dump($validate->getMessage());
+    print_r($validate->getMessage());
 }
+
 */
