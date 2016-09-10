@@ -1,5 +1,14 @@
 <html>
 <body>
+<?php
+if(isset($error)){
+    foreach ($error as $k => $v) {
+        foreach ($v as $key => $value) {
+            print "{$k} => {$value}<br />";
+        }
+    }
+}
+?>
 <h1>input.php</h1>
 <form method="post" action="/contact/confirm">
     <div class="form-group">
