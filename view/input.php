@@ -16,7 +16,7 @@ if(isset($error)){
         <input type="text" name="name" value="">
     </div>
     <div class="form-group">
-        <input name="gender" type="radio" value="men" ><label for="men">男</label>
+        <input name="gender" type="radio" value="men" checked="checked"><label for="men">男</label>
         <input name="gender" type="radio" value="women"><label for="women">女</label>
     </div>
     <div class="form-group">
