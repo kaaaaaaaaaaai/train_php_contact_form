@@ -10,8 +10,7 @@ class contactController{
         view("view.input");
     }
 
-    public function post_confirm(){
-        $request    = new Request();
+    public function post_confirm($request){
         view('view.confirm',$request->getPostAll());
     }
 }

@@ -45,7 +45,7 @@ class route {
         }
 
         //そのアクションメソッドの実行
-        $_controllerInstance->$_actionName();
+        $_controllerInstance->$_actionName(new Request());
     }
 
     private function ConvertControllerName($name){
